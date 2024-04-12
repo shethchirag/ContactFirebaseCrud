@@ -1,3 +1,61 @@
+import { FiSearch } from "react-icons/fi";
+import Navbar from "./components/Navbar";
+import { AiFillPlusCircle } from "react-icons/ai";
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "./config/firebase";
+
+import ContactCard from "./components/ContactCard";
+import AddAndUpdateContact from "./components/AddandUpdateContact";
+import useDisclose from "./hooks/useDisclose";
 export default function App() {
-  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
+  const [contacts, setContacts] = useState([]);
+  const { isOpen, isOpenHandler, isCloseHandler } = useDisclose();
+
+  useEffect(() => {
+    const getContact = async () => {
+      try {
+        const contactRef = collection(db, "contact");
+        const contactsSnapshot = await getDocs(contactRef);
+        const contactList = contactsSnapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+        setContacts(contactList);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getContact();
+  }, [contacts]);
+  return (
+    <>
+      <div className="mx-auto max-w-[400px] px-4  ">
+        <Navbar />
+        <div className="flex gap-2 ">
+          <div className="flex relative items-center flex-grow">
+            <FiSearch className="absolute ml-2 text-3xl text-white" />
+            <input
+              className="text-white pl-10 flex-grow h-10 rounded-md border border-white bg-transparent"
+              type="text"
+              name=""
+              id=""
+            />
+          </div>
+          <AiFillPlusCircle
+            onClick={isOpenHandler}
+            className="text-5xl text-white cursor-pointer"
+          />
+        </div>
+        <div className="mt-4 flex flex-col gap-3">
+          {contacts.map((contact) => {
+            return <ContactCard key={contact.id} contact={contact} />;
+          })}
+        </div>
+      </div>
+      <AddAndUpdateContact isOpen={isOpen} isCloseHandler={isCloseHandler} />
+    </>
+  );
 }
