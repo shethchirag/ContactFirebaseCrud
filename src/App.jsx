@@ -2,7 +2,7 @@ import { FiSearch } from "react-icons/fi";
 import Navbar from "./components/Navbar";
 import { AiFillPlusCircle } from "react-icons/ai";
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { db } from "./config/firebase";
 
 import ContactCard from "./components/ContactCard";
@@ -15,21 +15,23 @@ export default function App() {
   useEffect(() => {
     const getContact = async () => {
       try {
-        const contactRef = collection(db, "contact");
-        const contactsSnapshot = await getDocs(contactRef);
-        const contactList = contactsSnapshot.docs.map((doc) => {
-          return {
-            id: doc.id,
-            ...doc.data(),
-          };
+        const contactRef = collection(db, "contacts");
+        onSnapshot(contactRef, (snapshot) => {
+          const contactList = snapshot.docs.map((doc) => {
+            return {
+              id: doc.id,
+              ...doc.data(),
+            };
+          });
+          setContacts(contactList);
+          return contactList;
         });
-        setContacts(contactList);
       } catch (error) {
         console.log(error);
       }
     };
     getContact();
-  }, [contacts]);
+  }, []);
   return (
     <>
       <div className="mx-auto max-w-[400px] px-4  ">

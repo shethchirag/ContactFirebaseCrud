@@ -1,14 +1,23 @@
-import React from "react";
 import Model from "./Model";
 import { Field, Form, Formik } from "formik";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 
-const AddAndUpdateContact = ({ isOpen, isCloseHandler }) => {
+const AddAndUpdateContact = ({ isOpen, isCloseHandler, isUpdate, contact }) => {
   const addContact = async (contact) => {
     try {
-      const contactRef = collection(db, "contact");
+      const contactRef = collection(db, "contacts");
       await addDoc(contactRef, contact);
+      isCloseHandler();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const updateContact = async (contact, id) => {
+    try {
+      const contactRef = doc(db, "contacts", id);
+      await updateDoc(contactRef, contact);
+      isCloseHandler();
     } catch (error) {
       console.log(error);
     }
@@ -16,12 +25,19 @@ const AddAndUpdateContact = ({ isOpen, isCloseHandler }) => {
   return (
     <Model isOpen={isOpen} isCloseHandler={isCloseHandler}>
       <Formik
-        initialValues={{
-          name: "",
-          email: "",
-        }}
+        initialValues={
+          isUpdate
+            ? {
+                name: contact.name,
+                email: contact.email,
+              }
+            : {
+                name: "",
+                email: "",
+              }
+        }
         onSubmit={(values) => {
-          addContact(values);
+          isUpdate ? updateContact(values, contact.id) : addContact(values);
         }}
       >
         <Form className="flex flex-col">
@@ -42,7 +58,7 @@ const AddAndUpdateContact = ({ isOpen, isCloseHandler }) => {
             type="submit"
             className="self-end border bg-orange px-3 py-1.5"
           >
-            Add Contact
+            {isUpdate ? "Update Contact" : "Add Contact"}
           </button>
         </Form>
       </Formik>
