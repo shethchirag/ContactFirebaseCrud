@@ -1,8 +1,14 @@
 import Model from "./Model";
-import { Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { toast } from "react-toastify";
+import { object, string } from "yup";
+
+const ContactSchema = object({
+  name: string().required("Name is required"),
+  email: string().email("Invalid email").required("Email is required"),
+});
 
 const AddAndUpdateContact = ({ isOpen, isCloseHandler, isUpdate, contact }) => {
   const addContact = async (contact) => {
@@ -28,6 +34,7 @@ const AddAndUpdateContact = ({ isOpen, isCloseHandler, isUpdate, contact }) => {
   return (
     <Model isOpen={isOpen} isCloseHandler={isCloseHandler}>
       <Formik
+        validationSchema={ContactSchema}
         initialValues={
           isUpdate
             ? {
@@ -46,20 +53,34 @@ const AddAndUpdateContact = ({ isOpen, isCloseHandler, isUpdate, contact }) => {
         <Form className="flex flex-col">
           <div className="flex flex-col gap-1">
             <label htmlFor="name">Name</label>
-            <Field name="name" placeholder="Enter Name" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email">Name</label>
             <Field
-              className="h-10 border"
-              type="email"
-              name="email"
+              className="h-10 border rounded-md pl-2"
+              name="name"
               placeholder="Enter Name"
             />
+            <div>
+              <p className="text-red-500 text-xs">
+                <ErrorMessage name="name" />
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="email">Email</label>
+            <Field
+              className="h-10 border rounded-md pl-2"
+              type="email"
+              name="email"
+              placeholder="Enter Email"
+            />
+            <div>
+              <p className="text-red-500 text-xs">
+                <ErrorMessage name="email" />
+              </p>
+            </div>
           </div>
           <button
             type="submit"
-            className="self-end border bg-orange px-3 py-1.5"
+            className="self-end border bg-orange px-5 py-1.5 my-3 rounded-lg"
           >
             {isUpdate ? "Update Contact" : "Add Contact"}
           </button>

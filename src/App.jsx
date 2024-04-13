@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ContactCard from "./components/ContactCard";
 import AddAndUpdateContact from "./components/AddandUpdateContact";
 import useDisclose from "./hooks/useDisclose";
+import NotFoundContact from "./components/NotFoundContact";
 export default function App() {
   const [contacts, setContacts] = useState([]);
   const { isOpen, isOpenHandler, isCloseHandler } = useDisclose();
@@ -54,7 +55,7 @@ export default function App() {
   };
 
   return (
-    <>
+    <div>
       <div className="mx-auto max-w-[400px] px-4  ">
         <Navbar />
         <div className="flex gap-2 ">
@@ -74,13 +75,17 @@ export default function App() {
           />
         </div>
         <div className="mt-4 flex flex-col gap-3">
-          {contacts.map((contact) => {
-            return <ContactCard key={contact.id} contact={contact} />;
-          })}
+          {contacts.length <= 0 ? (
+            <NotFoundContact />
+          ) : (
+            contacts.map((contact) => {
+              return <ContactCard key={contact.id} contact={contact} />;
+            })
+          )}
         </div>
       </div>
       <AddAndUpdateContact isOpen={isOpen} isCloseHandler={isCloseHandler} />
       <ToastContainer position="bottom-center" />
-    </>
+    </div>
   );
 }
