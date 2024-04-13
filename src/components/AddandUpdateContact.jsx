@@ -2,6 +2,7 @@ import Model from "./Model";
 import { Field, Form, Formik } from "formik";
 import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { toast } from "react-toastify";
 
 const AddAndUpdateContact = ({ isOpen, isCloseHandler, isUpdate, contact }) => {
   const addContact = async (contact) => {
@@ -9,6 +10,7 @@ const AddAndUpdateContact = ({ isOpen, isCloseHandler, isUpdate, contact }) => {
       const contactRef = collection(db, "contacts");
       await addDoc(contactRef, contact);
       isCloseHandler();
+      toast.success("Contact added successfully");
     } catch (error) {
       console.log(error);
     }
@@ -18,6 +20,7 @@ const AddAndUpdateContact = ({ isOpen, isCloseHandler, isUpdate, contact }) => {
       const contactRef = doc(db, "contacts", id);
       await updateDoc(contactRef, contact);
       isCloseHandler();
+      toast.success("Contact updated successfully");
     } catch (error) {
       console.log(error);
     }
